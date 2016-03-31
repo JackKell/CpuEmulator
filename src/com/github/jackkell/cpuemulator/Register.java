@@ -8,23 +8,31 @@ public class Register {
 
     private Long value;
 
+    public long getBits(int bitmask, int bitoffset) {
+        return (value >> bitoffset) & bitmask;
+    }
+
+    public long getBits(int bitmask) {
+        return getBits(bitmask, 0);
+    }
+
     public long get64Bit() {
         return value;
     }
 
-    public int get32Bit() {
-        return value.intValue();
+    public long get32Bit() {
+        return getBits(0xFFFFFF);
     }
 
-    public short get16Bit() {
-        return value.shortValue();
+    public long get16Bit() {
+        return getBits(0xFFFF);
     }
 
-    public byte get8BitLower() {
-        return (byte)(value.intValue() & 0xFF);
+    public long get8BitLower() {
+        return getBits(0xFF);
     }
 
-    public byte get8BitHigher() {
-        return (byte)((value.intValue() >> 8) & 0xFF);
+    public long get8BitHigher() {
+        return getBits(0xFF, 8);
     }
 }

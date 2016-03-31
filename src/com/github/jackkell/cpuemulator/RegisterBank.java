@@ -5,13 +5,13 @@ import java.util.Map;
 
 public final class RegisterBank {
     public static Map<String, Register> generalRegisters = new HashMap<>();
-    public static Map<String, Short> segmentRegisters = new HashMap<>();
-    public static Map<String, Short> flagRegisters = new HashMap<>();
+    public static Map<String, Register> segmentRegisters = new HashMap<>();
+    public static Map<String, Register> flagRegisters = new HashMap<>();
     //public static Map<String, Integer> eflags = new HashMap<>();
     static {
         // General Registers
-        generalRegisters.put("rax", new Register(1000L));
-        generalRegisters.put("rbx", new Register(1337L));
+        generalRegisters.put("rax", new Register(0L));
+        generalRegisters.put("rbx", new Register(0L));
         generalRegisters.put("rcx", new Register(0L));
         generalRegisters.put("rdx", new Register(0L));
 
@@ -21,22 +21,22 @@ public final class RegisterBank {
         generalRegisters.put("rsp", new Register(0L));
         generalRegisters.put("rip", new Register(0L));
 
-        segmentRegisters.put("cs", (short) 0);
-        segmentRegisters.put("ds", (short) 0);
-        segmentRegisters.put("es", (short) 0);
-        segmentRegisters.put("fs", (short) 0);
-        segmentRegisters.put("gs", (short) 0);
-        segmentRegisters.put("ss", (short) 0);
+        segmentRegisters.put("cs", new Register(0L));
+        segmentRegisters.put("ds", new Register(0L));
+        segmentRegisters.put("es", new Register(0L));
+        segmentRegisters.put("fs", new Register(0L));
+        segmentRegisters.put("gs", new Register(0L));
+        segmentRegisters.put("ss", new Register(0L));
 
-        flagRegisters.put("cf", (short) 0);
-        flagRegisters.put("pf", (short) 0);
-        flagRegisters.put("af", (short) 0);
-        flagRegisters.put("zf", (short) 0);
-        flagRegisters.put("sf", (short) 0);
-        flagRegisters.put("tf", (short) 0);
-        flagRegisters.put("if", (short) 0);
-        flagRegisters.put("df", (short) 0);
-        flagRegisters.put("of", (short) 0);
+        flagRegisters.put("cf", new Register(0L));
+        flagRegisters.put("pf", new Register(0L));
+        flagRegisters.put("af", new Register(0L));
+        flagRegisters.put("zf", new Register(0L));
+        flagRegisters.put("sf", new Register(0L));
+        flagRegisters.put("tf", new Register(0L));
+        flagRegisters.put("if", new Register(0L));
+        flagRegisters.put("df", new Register(0L));
+        flagRegisters.put("of", new Register(0L));
 
     }
     /*

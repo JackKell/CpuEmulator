@@ -145,14 +145,14 @@ public final class ControlUnit {
             pattern = Pattern.compile(segmentRegisterRegex);
             matcher = pattern.matcher(registerName);
             if (matcher.matches()) {
-                return RegisterBank.segmentRegisters.get(registerName);
+                return RegisterBank.segmentRegisters.get(registerName).get16Bit();
             }
         }
         else if (registerName.matches(flagRegisterRegex)) {
             pattern = Pattern.compile(flagRegisterRegex);
             matcher = pattern.matcher(registerName);
             if (matcher.matches()) {
-                return RegisterBank.flagRegisters.get(registerName);
+                return RegisterBank.flagRegisters.get(registerName).get16Bit();
             }
         }
         else {
