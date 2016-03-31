@@ -10,7 +10,6 @@ public final class ControlUnit {
     private static String indexRegisterRegex = "[re]?([sd]i)l?";
     private static String pointerRegisterRegex = "[re]?([bsi]p)l?";
     private static String segmentRegisterRegex = "[cdefgs]s";
-    private static String flagRegisterRegex = "[cpazstido]f";
 
     public static void Mov(String destination, String source) {
 
@@ -146,13 +145,6 @@ public final class ControlUnit {
             matcher = pattern.matcher(registerName);
             if (matcher.matches()) {
                 return RegisterBank.segmentRegisters.get(registerName).get16Bit();
-            }
-        }
-        else if (registerName.matches(flagRegisterRegex)) {
-            pattern = Pattern.compile(flagRegisterRegex);
-            matcher = pattern.matcher(registerName);
-            if (matcher.matches()) {
-                return RegisterBank.flagRegisters.get(registerName).get16Bit();
             }
         }
         else {
