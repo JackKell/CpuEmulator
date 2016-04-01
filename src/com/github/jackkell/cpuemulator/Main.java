@@ -1,14 +1,29 @@
 package com.github.jackkell.cpuemulator;
 
+import com.github.jackkell.cpuemulator.cpu.Command;
 import com.github.jackkell.cpuemulator.cpu.Register;
+
+import java.util.Objects;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Register register = new Register(5L);
-        System.out.println(Long.toBinaryString(register.get8BitLower()));
-        //System.out.println(register.getBit(0));
-        //System.out.println(register.getBit(1));
-        //System.out.println(register.getBit(2));
-        System.out.println(Integer.toBinaryString(5 >> 2 & 1));
+        System.out.println("Welcome to CPU ASM x86 Emulator or C.A.x.E for short.");
+        Scanner reader = new Scanner(System.in);
+        Command currentCommand;
+        String userInput = "";
+        do {
+            System.out.println("Enter a command.");
+            System.out.print("--> ");
+            userInput = reader.nextLine().toLowerCase();
+            try {
+                currentCommand = new Command(userInput);
+                currentCommand.execute();
+            } catch (Exception e) {
+                System.out.println("Invalid format: " + userInput);
+            }
+
+        } while (!Objects.equals(userInput, "exit"));
+        reader.close();
     }
 }
