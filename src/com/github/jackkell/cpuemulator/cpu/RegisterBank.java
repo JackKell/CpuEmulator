@@ -14,11 +14,17 @@ public final class RegisterBank {
         generalRegisters.put("rcx", new Register(0L));
         generalRegisters.put("rdx", new Register(0L));
 
-        generalRegisters.put("rbp", new Register(5L));
+        generalRegisters.put("rbp", new Register(0L));
         generalRegisters.put("rsi", new Register(0L));
         generalRegisters.put("rdi", new Register(0L));
         generalRegisters.put("rsp", new Register(0L));
         generalRegisters.put("rip", new Register(0L));
 
+        segmentRegisters.put("cs", new Register(0L));
+        segmentRegisters.put("ds", new Register(0L));
+        segmentRegisters.put("es", new Register(0L));
+        segmentRegisters.put("fs", new Register(0L));
+        segmentRegisters.put("gs", new Register(0L));
+        segmentRegisters.put("ss", new Register(0L));
     }
 }
