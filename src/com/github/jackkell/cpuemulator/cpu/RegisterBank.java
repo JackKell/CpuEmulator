@@ -1,4 +1,4 @@
-package com.github.jackkell.cpuemulator;
+package com.github.jackkell.cpuemulator.cpu;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.github.jackkell.cpuemulator;
+package com.github.jackkell.cpuemulator.cpu;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -11,76 +11,93 @@ public final class ControlUnit {
     private static String pointerRegisterRegex = "[re]?([bsi]p)l?";
     private static String segmentRegisterRegex = "[cdefgs]s";
 
-    public static void Mov(String destination, String source) {
+
+    public static void runCommand(Command command) {
+        switch (command.getOperation()) {
+            case "mov":
+                //mov(command.getArguments());
+                break;
+            case "push":
+                break;
+            case "pop":
+                break;
+            case "lea":
+                break;
+            default:
+                break;
+        }
+    }
+
+    public static void mov(String destination, String source) {
 
     }
 
-    public static void Push(String destination, String source) {
+    public static void push(String destination, String source) {
 
     }
 
-    public static void Pop(String destination, String source) {
+    public static void pop(String destination, String source) {
 
     }
 
-    public static void Lea(String destination, String source) {
+    public static void lea(String destination, String source) {
 
     }
 
-    public static void Add(String destination, String source) {
+    public static void add(String destination, String source) {
 
     }
 
-    public static void Sub(String destination, String source) {
+    public static void sub(String destination, String source) {
 
     }
 
-    public static void Inc(String destination) {
+    public static void inc(String destination) {
 
     }
 
-    public static void Dec(String destination) {
+    public static void dec(String destination) {
 
     }
 
     // TODO: Fix the Imul and the Idiv functions
-    public static void Imul(String destination) {
+    public static void imul(String destination) {
 
     }
 
-    public static void Idiv(String destination) {
+    public static void idiv(String destination) {
 
     }
 
-    public static void And(String destination, String source) {
+    public static void and(String destination, String source) {
 
     }
 
-    public static void Or(String destination, String source) {
+    public static void or(String destination, String source) {
 
     }
 
-    public static void Xor(String destination, String source) {
+    public static void xor(String destination, String source) {
 
     }
 
-    public static void Not(String destination, String source) {
+    public static void not(String destination, String source) {
 
     }
 
-    public static void Neg(String destination, String source) {
+    public static void neg(String destination, String source) {
 
     }
 
-    public static void Shl(String destination, String source) {
+    public static void shl(String destination, String source) {
 
     }
 
-    public static void Shr(String destination, String source) {
+    public static void shr(String destination, String source) {
 
     }
 
-    public static void Cmp(String destination, String source) {
+    public static void cmp(String destination, String source) {
 
     }
 

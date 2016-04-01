@@ -1,4 +1,4 @@
-package com.github.jackkell.cpuemulator;
+package com.github.jackkell.cpuemulator.cpu;
 
 public final class Alu {
     public static long Add(long value1, long value2) {
