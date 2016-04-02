@@ -5,7 +5,7 @@ public final class Alu {
         return value1 + value2;
     }
 
-    public static long Substract(long value1, long value2) {
+    public static long Subtract(long value1, long value2) {
         return value1 - value2;
     }
 

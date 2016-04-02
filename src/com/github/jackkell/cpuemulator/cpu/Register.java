@@ -7,7 +7,7 @@ public class Register {
         this.value = value;
     }
 
-    private Long value;
+    private long value;
 
     public long getBit(int index) {
         return value >> index & 1;
@@ -54,19 +54,19 @@ public class Register {
     }
 
     public void set32Bit(int input) {
-        value = value >> 32 << 32 | input;
+        value = value >> 32 << 32 | (input & 0xFFFFFFFFL);
     }
 
     public void set16Bit(short input) {
-        value = value >> 16 << 16 | input;
+        value = value >> 16 << 16 | (input & 0xFFFF);
     }
 
     public void set8BitLower(Byte input) {
-        value = value >> 8 << 8 | input;
+        value = value >> 8 << 8 | (input & 0xFF);
     }
 
     public void set8BitHigher(Byte input) {
-        value = (((value >> 16 << 8) | input) << 8) | get8BitLower();
+        value = (((value >> 16 << 8) | (input & 0xFF)) << 8) | get8BitLower();
     }
 }
 

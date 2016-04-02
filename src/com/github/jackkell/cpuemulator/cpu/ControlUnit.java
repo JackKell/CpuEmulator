@@ -33,6 +33,20 @@ public final class ControlUnit {
                 break;
             case "pop":
                 break;
+            case "add":
+                try {
+                    add(command.getArguments());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case "sub":
+                try {
+                    sub(command.getArguments());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
             case "lea":
                 break;
             default:
@@ -41,27 +55,28 @@ public final class ControlUnit {
     }
 
     public static void dump() throws Exception {
-        System.out.println("RAX: " + Long.toBinaryString(RegisterBank.generalRegisters.get("rax").get64Bit()));
-        System.out.println("RBX: " + Long.toBinaryString(RegisterBank.generalRegisters.get("rbx").get64Bit()));
-        System.out.println("RCX: " + Long.toBinaryString(RegisterBank.generalRegisters.get("rcx").get64Bit()));
-        System.out.println("RDX: " + Long.toBinaryString(RegisterBank.generalRegisters.get("rdx").get64Bit()));
-
-        System.out.println("RBP: " + Long.toBinaryString(RegisterBank.generalRegisters.get("rbp").get64Bit()));
-        System.out.println("RSI: " + Long.toBinaryString(RegisterBank.generalRegisters.get("rsi").get64Bit()));
-        System.out.println("RDI: " + Long.toBinaryString(RegisterBank.generalRegisters.get("rdi").get64Bit()));
-        System.out.println("RSP: " + Long.toBinaryString(RegisterBank.generalRegisters.get("rsp").get64Bit()));
-        System.out.println("RIP: " + Long.toBinaryString(RegisterBank.generalRegisters.get("rip").get64Bit()));
-
-        System.out.println("CS: " + Long.toBinaryString(RegisterBank.segmentRegisters.get("cs").get16Bit()));
-        System.out.println("DS: " + Long.toBinaryString(RegisterBank.segmentRegisters.get("ds").get16Bit()));
-        System.out.println("ES: " + Long.toBinaryString(RegisterBank.segmentRegisters.get("es").get16Bit()));
-        System.out.println("FS: " + Long.toBinaryString(RegisterBank.segmentRegisters.get("fs").get16Bit()));
-        System.out.println("GS: " + Long.toBinaryString(RegisterBank.segmentRegisters.get("gs").get16Bit()));
-        System.out.println("SS: " + Long.toBinaryString(RegisterBank.segmentRegisters.get("ss").get16Bit()));
+        System.out.println("RAX: " + String.format("%64s", Long.toBinaryString(RegisterBank.generalRegisters.get("rax").get64Bit())).replace(' ', '0'));
+        System.out.println("RBX: " + String.format("%64s", Long.toBinaryString(RegisterBank.generalRegisters.get("rbx").get64Bit())).replace(' ', '0'));
+        System.out.println("RCX: " + String.format("%64s", Long.toBinaryString(RegisterBank.generalRegisters.get("rcx").get64Bit())).replace(' ', '0'));
+        System.out.println("RDX: " + String.format("%64s", Long.toBinaryString(RegisterBank.generalRegisters.get("rdx").get64Bit())).replace(' ', '0'));
+        System.out.println();
+        System.out.println("RBP: " + String.format("%64s", Long.toBinaryString(RegisterBank.generalRegisters.get("rbp").get64Bit())).replace(' ', '0'));
+        System.out.println("RSI: " + String.format("%64s", Long.toBinaryString(RegisterBank.generalRegisters.get("rsi").get64Bit())).replace(' ', '0'));
+        System.out.println("RDI: " + String.format("%64s", Long.toBinaryString(RegisterBank.generalRegisters.get("rdi").get64Bit())).replace(' ', '0'));
+        System.out.println("RSP: " + String.format("%64s", Long.toBinaryString(RegisterBank.generalRegisters.get("rsp").get64Bit())).replace(' ', '0'));
+        System.out.println("RIP: " + String.format("%64s", Long.toBinaryString(RegisterBank.generalRegisters.get("rip").get64Bit())).replace(' ', '0'));
+        System.out.println();
+        System.out.println("CS: " + String.format("%16s", Long.toBinaryString(RegisterBank.segmentRegisters.get("cs").get16Bit())).replace(' ', '0'));
+        System.out.println("DS: " + String.format("%16s", Long.toBinaryString(RegisterBank.segmentRegisters.get("ds").get16Bit())).replace(' ', '0'));
+        System.out.println("ES: " + String.format("%16s", Long.toBinaryString(RegisterBank.segmentRegisters.get("es").get16Bit())).replace(' ', '0'));
+        System.out.println("FS: " + String.format("%16s", Long.toBinaryString(RegisterBank.segmentRegisters.get("fs").get16Bit())).replace(' ', '0'));
+        System.out.println("GS: " + String.format("%16s", Long.toBinaryString(RegisterBank.segmentRegisters.get("gs").get16Bit())).replace(' ', '0'));
+        System.out.println("SS: " + String.format("%16s", Long.toBinaryString(RegisterBank.segmentRegisters.get("ss").get16Bit())).replace(' ', '0'));
+        System.out.println();
+        System.out.println("Flag: " + String.format("%64s", Long.toBinaryString(RegisterBank.flagRegister.get64Bit())).replace(' ', '0'));
     }
 
     public static void mov(List<String> arguments) throws Exception {
-        System.out.println(arguments.size());
         if (arguments.size() == 2) {
             setRegister(arguments.get(0), Long.parseLong(arguments.get(1)));
         } else {
@@ -97,16 +112,25 @@ public final class ControlUnit {
 
     }
 
-    public static void add(List<String> arguments) {
-
+    public static void add(List<String> arguments) throws Exception {
+        if (arguments.size() == 2) {
+            setRegister(arguments.get(0), Alu.Add(getRegister(arguments.get(0)) , Long.parseLong(arguments.get(1))));
+        }
+        else {
+            throw new Exception();
+        }
     }
 
     public static void add(String destination, String source) {
 
     }
 
-    public static void sub(List<String> arguments) {
-
+    public static void sub(List<String> arguments) throws Exception {
+        if (arguments.size() == 2) {
+            setRegister(arguments.get(0), Alu.Subtract(getRegister(arguments.get(0)), Long.parseLong(arguments.get(1))));
+        } else {
+            throw new Exception();
+        }
     }
 
     public static void sub(String destination, String source) {
@@ -210,7 +234,6 @@ public final class ControlUnit {
     }
 
     public static void setRegister(String registerName, long value) throws Exception {
-        registerName = registerName.toLowerCase();
         Pattern pattern;
         Matcher matcher;
 
@@ -229,6 +252,7 @@ public final class ControlUnit {
                 currentRegister.set8BitLower((byte)value);
             else if (Objects.equals(registerName, matchGroup + "h"))
                 currentRegister.set8BitHigher((byte)value);
+            return;
         }
 
         pattern = Pattern.compile(indexRegisterRegex);
@@ -244,6 +268,7 @@ public final class ControlUnit {
                 currentRegister.set16Bit((short) value);
             else if (Objects.equals(registerName, matchGroup + "l"))
                 currentRegister.set8BitLower((byte) value);
+            return;
         }
 
         pattern = Pattern.compile(pointerRegisterRegex);
@@ -260,16 +285,17 @@ public final class ControlUnit {
                 //else if (registerName == matchGroup + "l" && matchGroup != "ip")
             else if (!Objects.equals(Objects.equals(registerName, matchGroup + "l") + matchGroup, "ip"))
                 currentRegister.set8BitLower((byte) value);
+            return;
         }
 
         pattern = Pattern.compile(segmentRegisterRegex);
         matcher = pattern.matcher(registerName);
         if (matcher.matches()) {
             RegisterBank.segmentRegisters.get(registerName).set16Bit((short) value);
+            return;
         }
-        else {
-            throw new Exception();
-        }
+
+        throw new Exception();
     }
 
     public static long getRegister(String registerName) throws Exception {

@@ -19,7 +19,7 @@ public class Command {
             this.operation = matcher.group(1);
             if (matcher.groupCount() > 1) {
                 List<String> arguments = new ArrayList<>();
-                for(int currentArgumentIndex = 1; currentArgumentIndex < matcher.groupCount(); currentArgumentIndex++) {
+                for(int currentArgumentIndex = 2; currentArgumentIndex < matcher.groupCount(); currentArgumentIndex++) {
                     arguments.add(matcher.group(currentArgumentIndex));
                 }
                 this.arguments = arguments;
