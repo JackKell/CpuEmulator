@@ -19,6 +19,7 @@ public class Main {
                 currentCommand = new Command(userInput);
                 currentCommand.execute();
             } catch (Exception e) {
+                System.out.println(e.getMessage());
                 System.out.println("Invalid format: " + userInput);
             }
 

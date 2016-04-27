@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public class Command {
     static private String COMMAND_REGEX =  "^([a-z]+)(?:\\s+([^,]+))?(?:,\\s+([^,]+))?(?:,\\s+([^,]+))?$";
     private String raw;
-    private String operation;
+    private Operation operation;
     private List<CommandArg> arguments;
 
     public Command(String raw) throws Exception {
@@ -18,10 +18,14 @@ public class Command {
         Matcher matcher = pattern.matcher(raw);
         if (matcher.matches()) {
             this.raw = raw;
-            this.operation = matcher.group(1);
+            if (Operation.contains(matcher.group(1))) {
+                this.operation = Operation.valueOf(matcher.group(1));
+            } else {
+                throw new Exception("No such supported operation " + matcher.group(1) + ".");
+            }
             if (matcher.groupCount() > 1) {
                 List<CommandArg> arguments = new ArrayList<>();
-                for(int currentArgumentIndex = 2; currentArgumentIndex < matcher.groupCount(); currentArgumentIndex++) {
+                for(int currentArgumentIndex = 2; currentArgumentIndex <= matcher.groupCount(); currentArgumentIndex++) {
                     String argumentValue = matcher.group(currentArgumentIndex);
                     if (argumentValue == null) {
                         break;
@@ -62,6 +66,8 @@ public class Command {
                         arguments.add(memoryArg);
                         continue;
                     }
+
+                    arguments.add(new StringArg(argumentValue));
                 }
                 this.arguments = arguments;
             } else {
@@ -78,7 +84,7 @@ public class Command {
         return raw;
     }
 
-    public String getOperation() {
+    public Operation getOperation() {
         return operation;
     }
 

@@ -27,7 +27,7 @@ public class CommandTest {
         try {
             Command addCommand = new Command("add eax, 5");
             addCommand.execute();
-            long value = RegisterBank.getRegisterValue(rax);
+            long value = RegisterBank.getRegisterValue(eax);
             assertEquals("The add command does not work with a register and a constant.", 5, value);
         } catch (Exception e) {
             e.printStackTrace();
@@ -44,7 +44,7 @@ public class CommandTest {
             movCommand2.execute();
             Command addCommand = new Command("add eax, ebx");
             addCommand.execute();
-            long value = RegisterBank.getRegisterValue(rax);
+            long value = RegisterBank.getRegisterValue(eax);
             assertEquals("The add command does not work with a register and register.", 10, value);
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,7 +57,7 @@ public class CommandTest {
         try {
             Command subCommand = new Command("sub eax, 5");
             subCommand.execute();
-            long value = RegisterBank.getRegisterValue(rax);
+            long value = RegisterBank.getRegisterValue(eax);
             assertEquals("The sub command does not work with a register and a constant.", -5, value);
         } catch (Exception e) {
             e.printStackTrace();
@@ -70,7 +70,7 @@ public class CommandTest {
         try {
             Command incCommand = new Command("inc eax");
             incCommand.execute();
-            long value = RegisterBank.getRegisterValue(rax);
+            long value = RegisterBank.getRegisterValue(eax);
             assertEquals("The inc command does not work with a register and a constant.", 1, value);
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,8 +83,8 @@ public class CommandTest {
         try {
             Command decCommand = new Command("dec eax");
             decCommand.execute();
-            long value = RegisterBank.getRegisterValue(rax);
-            assertEquals("The dec command does not work with a register and a constant.", 1, value);
+            long value = RegisterBank.getRegisterValue(eax);
+            assertEquals("The dec command does not work with a register and a constant.", -1, value);
         } catch (Exception e) {
             e.printStackTrace();
             fail();

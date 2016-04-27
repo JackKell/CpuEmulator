@@ -3,43 +3,83 @@ package com.github.jackkell.cpuemulator.cpu;
 import com.github.jackkell.cpuemulator.util.*;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import static com.github.jackkell.cpuemulator.cpu.Alu.*;
 import static com.github.jackkell.cpuemulator.cpu.RegisterBank.*;
 import static com.github.jackkell.cpuemulator.cpu.Registers.*;
 
 public final class ControlUnit {
-
-    private static String generalRegisterRegex = "[er]?([a-d])[hlx]";
-    private static String indexRegisterRegex = "[re]?([sd]i)l?";
-    private static String pointerRegisterRegex = "[re]?([bsi]p)l?";
-    private static String segmentRegisterRegex = "[cdefgs]s";
-
-
     public static void runCommand(Command command) throws Exception {
-        switch (command.getOperation()) {
-            case "dump":
+        List<CommandArg> arguments = command.getArguments();
+        Operation operation = command.getOperation();
+        switch (operation) {
+            case dump:
                 dump();
                 break;
-            case "mov":
-                mov(command.getArguments());
+            case mov:
+                mov(arguments);
                 break;
-            case "push":
+            case push:
+                push(arguments);
                 break;
-            case "pop":
+            case pop:
+                pop(arguments);
                 break;
-            case "add":
-                Alu.add(command.getArguments());
+            case add:
+                add(arguments);
                 break;
-            case "sub":
-                Alu.sub(command.getArguments());
+            case sub:
+                sub(arguments);
                 break;
-            case "lea":
+            case inc:
+                inc(arguments);
                 break;
-            default:
+            case dec:
+                dec(arguments);
                 break;
+            case imul:
+                imul(arguments);
+                break;
+            case idiv:
+                idiv(arguments);
+                break;
+            case and:
+                add(arguments);
+                break;
+            case or:
+                or(arguments);
+                break;
+            case xor:
+                xor(arguments);
+                break;
+            case not:
+                not(arguments);
+                break;
+            case neg:
+                neg(arguments);
+                break;
+            case shl:
+                shl(arguments);
+                break;
+            case shr:
+                shr(arguments);
+                break;
+            case lea:
+                lea(arguments);
+                break;
+            case cmp:
+                cmp(arguments);
+                break;
+            case cld:
+                cld();
+                break;
+            case std:
+                std();
+                break;
+            case data:
+                data(arguments);
+                break;
+
         }
     }
 
@@ -63,6 +103,11 @@ public final class ControlUnit {
         System.out.println(getFormattedValue(rbp));
         System.out.println();
         System.out.println("Flag: " + Long.toBinaryString(flagRegister.get64Bit()));
+        System.out.println();
+        System.out.println("Memory");
+        for (String key : Memory.memory.keySet()) {
+            System.out.println(key + " : " + Long.toBinaryString(Memory.memory.get(key).value));
+        }
     }
 
     private static void mov(List<CommandArg> arguments) throws Exception {
@@ -109,155 +154,47 @@ public final class ControlUnit {
         Memory.memory.put(destination.getName(), new MemoryValue(source.getSize(), value));
     }
 
-    public static void push(List<String> arguments) {
-
+    private static void cld() {
+        RegisterBank.flagRegister.setBit(10, 0);
     }
 
-    public static void push(String destination, String source) {
-
+    private static void std() {
+        RegisterBank.flagRegister.setBit(10, 1);
     }
 
-    public static void pop(List<String> arguments) {
-
-    }
-
-    public static void pop(String destination, String source) {
-
-    }
-
-    public static void lea(List<String> arguments) {
-
-    }
-
-    public static void lea(String destination, String source) {
-
-    }
-
-    public static void setRegister(String registerName, long value) throws Exception {
-        Pattern pattern;
-        Matcher matcher;
-
-        pattern = Pattern.compile(generalRegisterRegex);
-        matcher = pattern.matcher(registerName);
-        if (matcher.matches()) {
-            String matchGroup = matcher.group(1);
-            Register currentRegister = generalRegisters.get("r" + matchGroup + "x");
-            if (Objects.equals(registerName, "r" + matchGroup + "x"))
-                currentRegister.set64Bit(value);
-            else if (Objects.equals(registerName, "e" + matchGroup + "x"))
-                currentRegister.set32Bit((int)value);
-            else if (Objects.equals(registerName, matchGroup + "x"))
-                currentRegister.set16Bit((short)value);
-            else if (Objects.equals(registerName, matchGroup + "l"))
-                currentRegister.set8BitLower((byte)value);
-            else if (Objects.equals(registerName, matchGroup + "h"))
-                currentRegister.set8BitHigher((byte)value);
-            return;
-        }
-
-        pattern = Pattern.compile(indexRegisterRegex);
-        matcher = pattern.matcher(registerName);
-        if (matcher.matches()) {
-            String matchGroup = matcher.group(1);
-            Register currentRegister = generalRegisters.get("r" + matchGroup);
-            if (Objects.equals(registerName, "r" + matchGroup))
-                currentRegister.set64Bit(value);
-            else if (Objects.equals(registerName, "e" + matchGroup))
-                currentRegister.set32Bit((int) value);
-            else if (Objects.equals(registerName, matchGroup))
-                currentRegister.set16Bit((short) value);
-            else if (Objects.equals(registerName, matchGroup + "l"))
-                currentRegister.set8BitLower((byte) value);
-            return;
-        }
-
-        pattern = Pattern.compile(pointerRegisterRegex);
-        matcher = pattern.matcher(registerName);
-        if (matcher.matches()) {
-            String matchGroup = matcher.group(1);
-            Register currentRegister = generalRegisters.get("r" + matchGroup);
-            if (Objects.equals(registerName, "r" + matchGroup))
-                currentRegister.set64Bit(value);
-            else if (Objects.equals(registerName, "e" + matchGroup))
-                currentRegister.set32Bit((int) value);
-            else if (Objects.equals(registerName, matchGroup))
-                currentRegister.set16Bit((short) value);
-                //else if (registerName == matchGroup + "l" && matchGroup != "ip")
-            else if (!Objects.equals(Objects.equals(registerName, matchGroup + "l") + matchGroup, "ip"))
-                currentRegister.set8BitLower((byte) value);
-            return;
-        }
-
-        pattern = Pattern.compile(segmentRegisterRegex);
-        matcher = pattern.matcher(registerName);
-        if (matcher.matches()) {
-            generalRegisters.get(registerName).set16Bit((short) value);
-            return;
-        }
-
-        throw new Exception();
-    }
-
-    public static long getRegister(String registerName) throws Exception {
-        registerName = registerName.toLowerCase();
-        Pattern pattern;
-        Matcher matcher;
-
-        pattern = Pattern.compile(generalRegisterRegex);
-        matcher = pattern.matcher(registerName);
-        if (matcher.matches()) {
-            String matchGroup = matcher.group(1);
-            Register currentRegister = generalRegisters.get("r" + matchGroup + "x");
-            if (Objects.equals(registerName, "r" + matchGroup + "x"))
-                return currentRegister.get64Bit();
-            else if (Objects.equals(registerName, "e" + matchGroup + "x"))
-                return currentRegister.get32Bit();
-            else if (Objects.equals(registerName, matchGroup + "x"))
-                return currentRegister.get16Bit();
-            else if (Objects.equals(registerName, matchGroup + "l"))
-                return currentRegister.get8BitLower();
-            else if (Objects.equals(registerName, matchGroup + "h"))
-                return currentRegister.get8BitHigher();
-        }
-
-        pattern = Pattern.compile(indexRegisterRegex);
-        matcher = pattern.matcher(registerName);
-        if (matcher.matches()) {
-            String matchGroup = matcher.group(1);
-            Register currentRegister = generalRegisters.get("r" + matchGroup);
-            if (Objects.equals(registerName, "r" + matchGroup))
-                return currentRegister.get64Bit();
-            else if (Objects.equals(registerName, "e" + matchGroup))
-                return currentRegister.get32Bit();
-            else if (Objects.equals(registerName, matchGroup))
-                return currentRegister.get16Bit();
-            else if (Objects.equals(registerName, matchGroup + "l"))
-                return currentRegister.get8BitLower();
-        }
-
-        pattern = Pattern.compile(pointerRegisterRegex);
-        matcher = pattern.matcher(registerName);
-        if (matcher.matches()) {
-            String matchGroup = matcher.group(1);
-            Register currentRegister = generalRegisters.get("r" + matchGroup);
-            if (Objects.equals(registerName, "r" + matchGroup))
-                return currentRegister.get64Bit();
-            else if (Objects.equals(registerName, "e" + matchGroup))
-                return currentRegister.get32Bit();
-            else if (Objects.equals(registerName, matchGroup))
-                return currentRegister.get16Bit();
-            //else if (registerName == matchGroup + "l" && matchGroup != "ip")
-            else if (!Objects.equals(Objects.equals(registerName, matchGroup + "l") + matchGroup, "ip"))
-                return currentRegister.get8BitLower();
-        }
-
-        pattern = Pattern.compile(segmentRegisterRegex);
-        matcher = pattern.matcher(registerName);
-        if (matcher.matches()) {
-            return generalRegisters.get(registerName).get16Bit();
-        }
-        else {
+    private static void data(List<CommandArg> arguments) throws Exception {
+        if (arguments.size() == 3) {
+            CommandArg arg1 = arguments.get(0);
+            CommandArg arg2 = arguments.get(1);
+            CommandArg arg3 = arguments.get(2);
+            if (arg1.getClass() == StringArg.class && arg2.getClass() == ConstantArg.class && arg3.getClass() == ConstantArg.class) {
+                data((StringArg) arg1, (ConstantArg) arg2, (ConstantArg) arg3);
+            } else {
+                throw new Exception();
+            }
+        } else {
             throw new Exception();
         }
+    }
+
+    private static void data(StringArg name, ConstantArg size, ConstantArg value) {
+        Memory.memory.put(name.getValue(), new MemoryValue(size.getSize(), value.getValue()));
+    }
+
+    // TODO: finish control flow and memory/stack functions
+    public static void push(List<CommandArg> arguments) {
+        System.out.println("Push command not yet supported by C.A.x.E");
+    }
+
+    public static void pop(List<CommandArg> arguments) {
+        System.out.println("Pop command not yet supported by C.A.x.E");
+    }
+
+    public static void lea(List<CommandArg> arguments) {
+        System.out.println("Lea command not yet supported by C.A.x.E");
+    }
+
+    public static void cmp(List<CommandArg> arguments) {
+        System.out.println("Cmp command not yet supported by C.A.x.E");
     }
 }
