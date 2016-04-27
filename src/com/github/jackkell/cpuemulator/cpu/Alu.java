@@ -197,7 +197,7 @@ public final class Alu {
         checkSize(destination.getSize(), source.getSize());
         long value1 = destination.getValue();
         long value2 = source.getValue();
-        long result = value1 + value2;
+        long result = value1 - value2;
         Memory.memory.put(destination.getName(), new MemoryValue(source.getSize(), result));
         updateFlags(destination.getSize(), value1, value2, result);
     }
