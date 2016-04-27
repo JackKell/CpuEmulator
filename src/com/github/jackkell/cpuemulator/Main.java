@@ -1,7 +1,6 @@
 package com.github.jackkell.cpuemulator;
 
-import com.github.jackkell.cpuemulator.cpu.Command;
-import com.github.jackkell.cpuemulator.cpu.Register;
+import com.github.jackkell.cpuemulator.util.Command;
 
 import java.util.Objects;
 import java.util.Scanner;

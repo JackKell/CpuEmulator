@@ -1,4 +1,6 @@
-package com.github.jackkell.cpuemulator.cpu;
+package com.github.jackkell.cpuemulator.util;
+
+import com.github.jackkell.cpuemulator.cpu.ControlUnit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +33,7 @@ public class Command {
         }
     }
 
-    public void execute() {
+    public void execute() throws Exception {
         ControlUnit.runCommand(this);
     }
 
