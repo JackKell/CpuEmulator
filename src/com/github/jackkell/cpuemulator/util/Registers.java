@@ -1,7 +1,11 @@
-package com.github.jackkell.cpuemulator.cpu;
+package com.github.jackkell.cpuemulator.util;
 
 import java.util.Objects;
 
+/*
+Register is an enum that represents all of the possible registers that the user can type in along with their
+corresponding group and size.
+ */
 public enum Registers {
     rax("rax", 64), rbx("rbx", 64), rcx("rcx", 64),
     rdx("rdx", 64), rbp("rbp", 64), rsi("rsi", 64),
@@ -35,6 +39,7 @@ public enum Registers {
     public String group() {return group;}
     public int size() {return size;}
 
+    // Checks if given register name is contained with the Registers enum
     public static boolean contains(String name) {
         for (Registers register : Registers.values()) {
             if (Objects.equals(register.name(), name)) {

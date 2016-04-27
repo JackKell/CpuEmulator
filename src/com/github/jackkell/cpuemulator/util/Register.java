@@ -1,4 +1,4 @@
-package com.github.jackkell.cpuemulator.cpu;
+package com.github.jackkell.cpuemulator.util;
 
 
 public class Register {

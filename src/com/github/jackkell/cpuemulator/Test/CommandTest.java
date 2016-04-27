@@ -4,7 +4,7 @@ import com.github.jackkell.cpuemulator.util.Command;
 import com.github.jackkell.cpuemulator.cpu.RegisterBank;
 import org.junit.Test;
 
-import static com.github.jackkell.cpuemulator.cpu.Registers.*;
+import static com.github.jackkell.cpuemulator.util.Registers.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 

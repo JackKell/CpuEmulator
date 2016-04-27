@@ -1,5 +1,7 @@
 package com.github.jackkell.cpuemulator.cpu;
 
+import com.github.jackkell.cpuemulator.util.MemoryValue;
+
 import java.util.HashMap;
 import java.util.Map;
 

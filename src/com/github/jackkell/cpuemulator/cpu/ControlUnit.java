@@ -6,9 +6,14 @@ import java.util.List;
 
 import static com.github.jackkell.cpuemulator.cpu.Alu.*;
 import static com.github.jackkell.cpuemulator.cpu.RegisterBank.*;
-import static com.github.jackkell.cpuemulator.cpu.Registers.*;
+import static com.github.jackkell.cpuemulator.util.Registers.*;
 
+/*
+The Control Unit decides which function are run base on the given command. Additionally
+the control unit handles functions that control the flow of the program.
+ */
 public final class ControlUnit {
+    // The function determines which function will be run
     public static void runCommand(Command command) throws Exception {
         List<CommandArg> arguments = command.getArguments();
         Operation operation = command.getOperation();
@@ -83,6 +88,7 @@ public final class ControlUnit {
         }
     }
 
+    // dump an operation that prints all registers, flags, and memory to the screen
     public static void dump() throws Exception {
         System.out.println(getFormattedValue(rax));
         System.out.println(getFormattedValue(rbx));
@@ -110,6 +116,7 @@ public final class ControlUnit {
         }
     }
 
+    // Assigns a value to another value
     private static void mov(List<CommandArg> arguments) throws Exception {
         if (arguments.size() == 2) {
             CommandArg arg1 = arguments.get(0);
@@ -132,36 +139,44 @@ public final class ControlUnit {
         }
     }
 
+    // Assigns a constant value to a register value
     private static void mov(RegisterArg destination, ConstantArg source) throws Exception {
         setRegisterValue(destination.getRegister(), source.getValue());
     }
 
+    // Assigns a memory value to a register value
     private static void mov(RegisterArg destination, MemoryArg source) throws Exception {
         setRegisterValue(destination.getRegister(), source.getValue());
     }
 
+    // Assigns a memory value to a register value
     private static void mov(RegisterArg destination, RegisterArg source) throws Exception {
         long value = getRegisterValue(source.getRegister());
         setRegisterValue(destination.getRegister(), value);
     }
 
+    // Assigns a constant value to a memory value
     private static void mov(MemoryArg destination, ConstantArg source) {
         Memory.memory.put(destination.getName(), new MemoryValue(source.getSize(), source.getValue()));
     }
 
+    // Assigns a register value to a memory value
     private static void mov(MemoryArg destination, RegisterArg source) throws Exception {
         long value = getRegisterValue(source.getRegister());
         Memory.memory.put(destination.getName(), new MemoryValue(source.getSize(), value));
     }
 
+    // Sets the direction flag to in-active
     private static void cld() {
         RegisterBank.flagRegister.setBit(10, 0);
     }
 
+    // Sets the direction flag to active
     private static void std() {
         RegisterBank.flagRegister.setBit(10, 1);
     }
 
+    // A command that creates a value in memory
     private static void data(List<CommandArg> arguments) throws Exception {
         if (arguments.size() == 3) {
             CommandArg arg1 = arguments.get(0);
@@ -177,6 +192,7 @@ public final class ControlUnit {
         }
     }
 
+    // Creates a new value in memory with the given name, size, and value
     private static void data(StringArg name, ConstantArg size, ConstantArg value) {
         Memory.memory.put(name.getValue(), new MemoryValue(size.getSize(), value.getValue()));
     }

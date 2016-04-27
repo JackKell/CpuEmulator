@@ -1,8 +1,10 @@
 package com.github.jackkell.cpuemulator.util;
 
 import com.github.jackkell.cpuemulator.cpu.Memory;
-import com.github.jackkell.cpuemulator.cpu.MemoryValue;
 
+/*
+A MemoryArg is a type of CommandArg that is used to represent a memory value being passed into the argument list
+ */
 public class MemoryArg extends CommandArg {
     private final String name;
     private final long value;

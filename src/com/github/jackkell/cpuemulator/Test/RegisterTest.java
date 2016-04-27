@@ -1,6 +1,6 @@
 package com.github.jackkell.cpuemulator.Test;
 
-import com.github.jackkell.cpuemulator.cpu.Register;
+import com.github.jackkell.cpuemulator.util.Register;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -1,16 +1,25 @@
 package com.github.jackkell.cpuemulator.cpu;
 
+import com.github.jackkell.cpuemulator.util.Register;
+import com.github.jackkell.cpuemulator.util.Registers;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.jackkell.cpuemulator.cpu.Registers.*;
+import static com.github.jackkell.cpuemulator.util.Registers.*;
 
+/*
+The Register Bank represents where all of the registers are located on the CPU. The register bank is a able to
+get and set the register within the bank.
+ */
 public final class RegisterBank {
-
-
-
+    // The general purpose registers
     public static Map<String, Register> generalRegisters = new HashMap<>();
+
+    // The flag status register
     public static Register flagRegister = new Register(0L);
+
+    // When the final class Register Bank is created it starts with the following initialization
     static {
         // General Registers
         generalRegisters.put(rax.name(), new Register(0L));
@@ -32,10 +41,12 @@ public final class RegisterBank {
         generalRegisters.put(ss.name(), new Register(0L));
     }
 
+    // Returns a formatted string for a given register value
     public static String getFormattedValue(Registers register) {
         return register.name() + " : " + Long.toBinaryString(getRegisterValue(register));
     }
 
+    // Get the value of a segment of a register
     public static long getRegisterValue(Registers register) {
         switch (register.size()) {
             case 64:
@@ -66,6 +77,7 @@ public final class RegisterBank {
         }
     }
 
+    // Set the value of a given register based on a given value
     public static void setRegisterValue(Registers register, long value) {
         switch (register.size()) {
             case 64:
