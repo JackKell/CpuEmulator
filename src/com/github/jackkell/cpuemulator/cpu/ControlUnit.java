@@ -1,11 +1,14 @@
 package com.github.jackkell.cpuemulator.cpu;
 
-import com.github.jackkell.cpuemulator.util.Command;
+import com.github.jackkell.cpuemulator.util.*;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.github.jackkell.cpuemulator.cpu.RegisterBank.*;
+import static com.github.jackkell.cpuemulator.cpu.Registers.*;
 
 public final class ControlUnit {
 
@@ -28,10 +31,10 @@ public final class ControlUnit {
             case "pop":
                 break;
             case "add":
-                add(command.getArguments());
+                Alu.add(command.getArguments());
                 break;
             case "sub":
-                sub(command.getArguments());
+                Alu.sub(command.getArguments());
                 break;
             case "lea":
                 break;
@@ -41,37 +44,69 @@ public final class ControlUnit {
     }
 
     public static void dump() throws Exception {
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rax));
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rbx));
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rcx));
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rdx));
+        System.out.println(getFormattedValue(rax));
+        System.out.println(getFormattedValue(rbx));
+        System.out.println(getFormattedValue(rcx));
+        System.out.println(getFormattedValue(rdx));
         System.out.println();
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rbp));
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rsi));
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rdi));
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rsp));
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rip));
+        System.out.println(getFormattedValue(rbp));
+        System.out.println(getFormattedValue(rsi));
+        System.out.println(getFormattedValue(rdi));
+        System.out.println(getFormattedValue(rsp));
+        System.out.println(getFormattedValue(rip));
         System.out.println();
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rbp));
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rbp));
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rbp));
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rbp));
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rbp));
-        System.out.println(RegisterBank.getFormattedValue(RegisterBank.Reg.rbp));
+        System.out.println(getFormattedValue(rbp));
+        System.out.println(getFormattedValue(rbp));
+        System.out.println(getFormattedValue(rbp));
+        System.out.println(getFormattedValue(rbp));
+        System.out.println(getFormattedValue(rbp));
+        System.out.println(getFormattedValue(rbp));
         System.out.println();
-        System.out.println("Flag: " + Long.toBinaryString(RegisterBank.flagRegister.get64Bit()));
+        System.out.println("Flag: " + Long.toBinaryString(flagRegister.get64Bit()));
     }
 
-    public static void mov(List<String> arguments) throws Exception {
+    private static void mov(List<CommandArg> arguments) throws Exception {
         if (arguments.size() == 2) {
-            setRegister(arguments.get(0), Long.parseLong(arguments.get(1)));
+            CommandArg arg1 = arguments.get(0);
+            CommandArg arg2 = arguments.get(1);
+            if (arg1.getClass() == RegisterArg.class && arg2.getClass() == ConstantArg.class) {
+                mov((RegisterArg) arg1, (ConstantArg) arg2);
+            } else if (arg1.getClass() == RegisterArg.class && arg2.getClass() == MemoryArg.class) {
+                mov((RegisterArg) arg1, (MemoryArg) arg2);
+            } else if (arg1.getClass() == RegisterArg.class && arg2.getClass() == RegisterArg.class) {
+                mov((RegisterArg) arg1, (RegisterArg) arg2);
+            } else if (arg1.getClass() == MemoryArg.class && arg2.getClass() == ConstantArg.class) {
+                mov((MemoryArg) arg1, (ConstantArg) arg2);
+            } else if (arg1.getClass() == MemoryArg.class && arguments.get(1).getClass() == RegisterArg.class) {
+                mov((MemoryArg) arg1, (RegisterArg) arg2);
+            } else {
+                throw new Exception();
+            }
         } else {
             throw new Exception();
         }
     }
 
-    public static void mov(String destination, String source) {
+    private static void mov(RegisterArg destination, ConstantArg source) throws Exception {
+        setRegisterValue(destination.getRegister(), source.getValue());
+    }
 
+    private static void mov(RegisterArg destination, MemoryArg source) throws Exception {
+        setRegisterValue(destination.getRegister(), source.getValue());
+    }
+
+    private static void mov(RegisterArg destination, RegisterArg source) throws Exception {
+        long value = getRegisterValue(source.getRegister());
+        setRegisterValue(destination.getRegister(), value);
+    }
+
+    private static void mov(MemoryArg destination, ConstantArg source) {
+        Memory.memory.put(destination.getName(), new MemoryValue(source.getSize(), source.getValue()));
+    }
+
+    private static void mov(MemoryArg destination, RegisterArg source) throws Exception {
+        long value = getRegisterValue(source.getRegister());
+        Memory.memory.put(destination.getName(), new MemoryValue(source.getSize(), value));
     }
 
     public static void push(List<String> arguments) {
@@ -98,127 +133,6 @@ public final class ControlUnit {
 
     }
 
-    public static void add(List<String> arguments) throws Exception {
-        if (arguments.size() == 2) {
-            setRegister(arguments.get(0), Alu.Add(getRegister(arguments.get(0)) , Long.parseLong(arguments.get(1))));
-        }
-        else {
-            throw new Exception();
-        }
-    }
-
-    public static void add(String destination, String source) {
-
-    }
-
-    public static void sub(List<String> arguments) throws Exception {
-        if (arguments.size() == 2) {
-            setRegister(arguments.get(0), Alu.Subtract(getRegister(arguments.get(0)), Long.parseLong(arguments.get(1))));
-        } else {
-            throw new Exception();
-        }
-    }
-
-    public static void sub(String destination, String source) {
-
-    }
-
-    public static void inc(List<String> arguments) {
-
-    }
-
-    public static void inc(String destination) {
-
-    }
-
-    public static void dec(List<String> arguments) {
-
-    }
-
-    public static void dec(String destination) {
-
-    }
-
-    public static void imul(List<String> arguments) {
-
-    }
-
-    public static void imul(String destination) {
-
-    }
-
-    public static void idiv(List<String> arguments) {
-
-    }
-
-    public static void idiv(String destination) {
-
-    }
-
-    public static void and(List<String> arguments) {
-
-    }
-
-    public static void and(String destination, String source) {
-
-    }
-
-    public static void or(List<String> arguments) {
-
-    }
-
-    public static void or(String destination, String source) {
-
-    }
-
-    public static void xor(List<String> arguments) {
-
-    }
-
-    public static void xor(String destination, String source) {
-
-    }
-
-    public static void not(List<String> arguments) {
-
-    }
-
-    public static void not(String destination, String source) {
-
-    }
-
-    public static void neg(List<String> arguments) {
-
-    }
-
-    public static void neg(String destination, String source) {
-
-    }
-
-    public static void shl(List<String> arguments) {
-
-    }
-
-    public static void shl(String destination, String source) {
-
-    }
-
-    public static void shr(List<String> arguments) {
-
-    }
-
-    public static void shr(String destination, String source) {
-
-    }
-
-    public static void cmp(List<String> arguments) {
-
-    }
-
-    public static void cmp(String destination, String source) {
-
-    }
-
     public static void setRegister(String registerName, long value) throws Exception {
         Pattern pattern;
         Matcher matcher;
@@ -227,7 +141,7 @@ public final class ControlUnit {
         matcher = pattern.matcher(registerName);
         if (matcher.matches()) {
             String matchGroup = matcher.group(1);
-            Register currentRegister = RegisterBank.generalRegisters.get("r" + matchGroup + "x");
+            Register currentRegister = generalRegisters.get("r" + matchGroup + "x");
             if (Objects.equals(registerName, "r" + matchGroup + "x"))
                 currentRegister.set64Bit(value);
             else if (Objects.equals(registerName, "e" + matchGroup + "x"))
@@ -245,7 +159,7 @@ public final class ControlUnit {
         matcher = pattern.matcher(registerName);
         if (matcher.matches()) {
             String matchGroup = matcher.group(1);
-            Register currentRegister = RegisterBank.generalRegisters.get("r" + matchGroup);
+            Register currentRegister = generalRegisters.get("r" + matchGroup);
             if (Objects.equals(registerName, "r" + matchGroup))
                 currentRegister.set64Bit(value);
             else if (Objects.equals(registerName, "e" + matchGroup))
@@ -261,7 +175,7 @@ public final class ControlUnit {
         matcher = pattern.matcher(registerName);
         if (matcher.matches()) {
             String matchGroup = matcher.group(1);
-            Register currentRegister = RegisterBank.generalRegisters.get("r" + matchGroup);
+            Register currentRegister = generalRegisters.get("r" + matchGroup);
             if (Objects.equals(registerName, "r" + matchGroup))
                 currentRegister.set64Bit(value);
             else if (Objects.equals(registerName, "e" + matchGroup))
@@ -277,7 +191,7 @@ public final class ControlUnit {
         pattern = Pattern.compile(segmentRegisterRegex);
         matcher = pattern.matcher(registerName);
         if (matcher.matches()) {
-            RegisterBank.generalRegisters.get(registerName).set16Bit((short) value);
+            generalRegisters.get(registerName).set16Bit((short) value);
             return;
         }
 
@@ -293,7 +207,7 @@ public final class ControlUnit {
         matcher = pattern.matcher(registerName);
         if (matcher.matches()) {
             String matchGroup = matcher.group(1);
-            Register currentRegister = RegisterBank.generalRegisters.get("r" + matchGroup + "x");
+            Register currentRegister = generalRegisters.get("r" + matchGroup + "x");
             if (Objects.equals(registerName, "r" + matchGroup + "x"))
                 return currentRegister.get64Bit();
             else if (Objects.equals(registerName, "e" + matchGroup + "x"))
@@ -310,7 +224,7 @@ public final class ControlUnit {
         matcher = pattern.matcher(registerName);
         if (matcher.matches()) {
             String matchGroup = matcher.group(1);
-            Register currentRegister = RegisterBank.generalRegisters.get("r" + matchGroup);
+            Register currentRegister = generalRegisters.get("r" + matchGroup);
             if (Objects.equals(registerName, "r" + matchGroup))
                 return currentRegister.get64Bit();
             else if (Objects.equals(registerName, "e" + matchGroup))
@@ -325,7 +239,7 @@ public final class ControlUnit {
         matcher = pattern.matcher(registerName);
         if (matcher.matches()) {
             String matchGroup = matcher.group(1);
-            Register currentRegister = RegisterBank.generalRegisters.get("r" + matchGroup);
+            Register currentRegister = generalRegisters.get("r" + matchGroup);
             if (Objects.equals(registerName, "r" + matchGroup))
                 return currentRegister.get64Bit();
             else if (Objects.equals(registerName, "e" + matchGroup))
@@ -340,7 +254,7 @@ public final class ControlUnit {
         pattern = Pattern.compile(segmentRegisterRegex);
         matcher = pattern.matcher(registerName);
         if (matcher.matches()) {
-            return RegisterBank.generalRegisters.get(registerName).get16Bit();
+            return generalRegisters.get(registerName).get16Bit();
         }
         else {
             throw new Exception();

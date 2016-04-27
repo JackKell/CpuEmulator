@@ -1,6 +1,6 @@
 package com.github.jackkell.cpuemulator.util;
 
-import com.github.jackkell.cpuemulator.cpu.ControlUnit;
+import com.github.jackkell.cpuemulator.cpu.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ public class Command {
     static private String COMMAND_REGEX =  "^([a-z]+)(?:\\s+([^,]+))?(?:,\\s+([^,]+))?(?:,\\s+([^,]+))?$";
     private String raw;
     private String operation;
-    private List<String> arguments;
+    private List<CommandArg> arguments;
 
     public Command(String raw) throws Exception {
         Pattern pattern = Pattern.compile(COMMAND_REGEX);
@@ -20,16 +20,53 @@ public class Command {
             this.raw = raw;
             this.operation = matcher.group(1);
             if (matcher.groupCount() > 1) {
-                List<String> arguments = new ArrayList<>();
+                List<CommandArg> arguments = new ArrayList<>();
                 for(int currentArgumentIndex = 2; currentArgumentIndex < matcher.groupCount(); currentArgumentIndex++) {
-                    arguments.add(matcher.group(currentArgumentIndex));
+                    String argumentValue = matcher.group(currentArgumentIndex);
+                    if (argumentValue == null) {
+                        break;
+                    }
+                    CommandArg commandArg;
+                    if (Registers.contains(argumentValue)) {
+                        RegisterArg registerArg = new RegisterArg(Registers.valueOf(argumentValue));
+                        arguments.add(registerArg);
+                        continue;
+                    }
+
+                    Long value;
+                    try {
+                        value = Long.parseLong(argumentValue);
+                    } catch (NumberFormatException numberFormatException) {
+                        value = null;
+                    }
+                    if (value != null) {
+                        int size = 0;
+                        String binaryValue = Long.toBinaryString(value);
+                        if (binaryValue.length() <= 8) {
+                            size = 8;
+                        } else if (binaryValue.length() <= 16) {
+                            size = 16;
+                        } else if (binaryValue.length() <= 32) {
+                            size = 32;
+                        } else {
+                            size = 64;
+                        }
+                        ConstantArg constantArg = new ConstantArg(size, value);
+                        arguments.add(constantArg);
+                        continue;
+                    }
+
+                    MemoryValue memoryValue = Memory.memory.get(argumentValue);
+                    if (memoryValue != null) {
+                        MemoryArg memoryArg = new MemoryArg(argumentValue);
+                        arguments.add(memoryArg);
+                        continue;
+                    }
                 }
                 this.arguments = arguments;
             } else {
                 this.arguments = new ArrayList<>();
             }
-        } else {
-            throw new Exception();
         }
     }
 
@@ -45,7 +82,7 @@ public class Command {
         return operation;
     }
 
-    public List<String> getArguments() {
+    public List<CommandArg> getArguments() {
         return arguments;
     }
 }

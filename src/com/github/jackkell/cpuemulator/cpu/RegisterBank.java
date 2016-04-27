@@ -3,44 +3,11 @@ package com.github.jackkell.cpuemulator.cpu;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.jackkell.cpuemulator.cpu.RegisterBank.Reg.*;
-import static java.lang.String.format;
+import static com.github.jackkell.cpuemulator.cpu.Registers.*;
 
 public final class RegisterBank {
 
-    public enum Reg {
-        rax("rax", 64), rbx("rbx", 64), rcx("rcx", 64),
-        rdx("rdx", 64), rbp("rbp", 64), rsi("rsi", 64),
-        rdi("rdi", 64), rsp("rsp", 64), rip("rip", 64),
 
-        eax("rax", 32), ebx("rbx", 32), ecx("rcx", 32),
-        edx("rdx", 32), ebp("rbp", 32), esi("rsi", 32),
-        edi("rdi", 32), esp("rsp", 32), eip("rip", 32),
-
-        ax("rax", 16), bx("rbx", 16), cx("rcx", 16),
-        dx("rdx", 16), bp("rbp", 16), si("rsi", 16),
-        di("rdi", 16), sp("rsp", 16), ip("rip", 16),
-
-        ah("rax", 8), bh("rbx", 8), ch("rcx", 8),
-        dh("rdx", 8),
-
-        al("rax", 8), bl("rbx", 8), cl("rcx", 8),
-        dl("rdx", 8), bpl("rbp", 8), sil("rsi", 8),
-        spl("rsp", 8), dil("rdi", 8),
-
-        cs("cs", 16), ds("ds", 16), es("es", 16),
-        fs("fs", 16), gs("gs", 16), ss("ss", 16);
-
-        private final int size;
-        private final String group;
-        Reg(String group, int size) {
-            this.group = group;
-            this.size = size;
-        }
-
-        private String group() {return group;}
-        private int size() {return size;}
-    }
 
     public static Map<String, Register> generalRegisters = new HashMap<>();
     public static Register flagRegister = new Register(0L);
@@ -65,35 +32,18 @@ public final class RegisterBank {
         generalRegisters.put(ss.name(), new Register(0L));
     }
 
-    public static String getFormattedValue(Reg register) {
+    public static String getFormattedValue(Registers register) {
         return register.name() + " : " + Long.toBinaryString(getRegisterValue(register));
     }
 
-    public static long getRegisterValue(Reg register) {
+    public static long getRegisterValue(Registers register) {
         switch (register.size()) {
             case 64:
                 return generalRegisters.get(register.group()).get64Bit();
             case 32:
                 return generalRegisters.get(register.group()).get32Bit();
             case 16:
-                switch (register) {
-                    case ax:
-                    case bx:
-                    case cx:
-                    case dx:
-                    case bp:
-                    case si:
-                    case di:
-                    case sp:
-                    case ip:
-                    case cs:
-                    case ds:
-                    case es:
-                    case fs:
-                    case gs:
-                    case ss:
-                        return generalRegisters.get(register.group()).get16Bit();
-                }
+                return generalRegisters.get(register.group()).get16Bit();
             case 8:
                 switch (register) {
                     case ah:
@@ -113,6 +63,38 @@ public final class RegisterBank {
                 }
             default:
                 return 0;
+        }
+    }
+
+    public static void setRegisterValue(Registers register, long value) {
+        switch (register.size()) {
+            case 64:
+                generalRegisters.get(register.group()).set64Bit(value);
+                return;
+            case 32:
+                generalRegisters.get(register.group()).set32Bit((int) value);
+                return;
+            case 16:
+                generalRegisters.get(register.group()).set16Bit((short) value);
+                return;
+            case 8:
+                switch (register) {
+                    case ah:
+                    case bh:
+                    case ch:
+                    case dh:
+                        generalRegisters.get(register.group()).set8BitHigher((byte) value);
+                        return;
+                    case al:
+                    case bl:
+                    case cl:
+                    case dl:
+                    case bpl:
+                    case sil:
+                    case spl:
+                    case dil:
+                        generalRegisters.get(register.group()).set8BitLower((byte) value);
+                }
         }
     }
 }
